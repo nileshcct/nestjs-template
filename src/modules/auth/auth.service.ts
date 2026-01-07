@@ -6,6 +6,8 @@ import { RegisterUseCase } from './application/use-cases/register.usecase';
 import { RefreshTokenUseCase } from './application/use-cases/refresh-token.usecase';
 import { RegisterDto } from './dto/register.dto';
 import { LogoutUseCase } from './application/use-cases/logout.usecase';
+import { VerifyOtpUseCase } from './application/use-cases/verify-otp.usecase';
+import { VerifyAuthDto } from './dto/verify-auth.dto';
 
 @Injectable()
 export class AuthService {
@@ -14,6 +16,7 @@ export class AuthService {
     private readonly registerUseCase: RegisterUseCase,
     private readonly refreshTokenUseCase: RefreshTokenUseCase,
     private readonly logoutUseCase: LogoutUseCase,
+    private readonly verifyOtpUseCase: VerifyOtpUseCase,
   ) {}
 
   async login(dto: LoginDto, meta: { ip: string; userAgent: string }): Promise<AuthResponseDto> {
@@ -26,6 +29,9 @@ export class AuthService {
 
   async refreshToken(refreshToken: string): Promise<{ accessToken: any }> {
     return this.refreshTokenUseCase.execute(refreshToken);
+  }
+  async verify(dto: VerifyAuthDto): Promise<any> {
+    return this.verifyOtpUseCase.execute(dto);
   }
   // async logout(refreshToken: string): Promise<void> {
   //   await this.logoutUseCase.execute(refreshToken);

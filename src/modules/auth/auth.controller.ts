@@ -13,6 +13,7 @@ import { LoginDto } from './dto/login.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { RegisterDto } from './dto/register.dto';
 import type { Request } from 'express';
+import { VerifyAuthDto } from './dto/verify-auth.dto';
 
 @Controller('auth')
 @UsePipes(new ValidationPipe({ whitelist: true }))
@@ -41,6 +42,10 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   async refresh(@Body() { refreshToken }: RefreshTokenDto): Promise<any> {
     return this.authService.refreshToken(refreshToken);
+  }
+    @Post('verify')
+  async verify(@Body() dto: VerifyAuthDto) {
+    await this.authService.verify(dto);
   }
   // @Post('logout')
   // @HttpCode(204)

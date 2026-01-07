@@ -3,6 +3,8 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Types, Document } from 'mongoose';
 import { COLLECTIONS } from 'src/infrastructure/database/constants/collections';
+import { AuthIdentityType } from 'src/modules/auth/constants/auth-identity.type.enum';
+
 
 export type AuthIdentityDocument = AuthIdentity & Document;
 
@@ -15,7 +17,7 @@ export class AuthIdentity {
   userId: Types.ObjectId;
 
   @Prop({
-    enum: ['EMAIL', 'PHONE', 'GOOGLE', 'GITHUB'],
+    enum: AuthIdentityType,
     required: true,
   })
   provider: string;

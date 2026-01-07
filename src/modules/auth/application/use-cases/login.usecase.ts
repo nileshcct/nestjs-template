@@ -1,15 +1,13 @@
-import type { AuthRepository } from '../../domain/repositories/auth.repository';
 import type { RefreshTokenRepository } from '../../domain/repositories/refresh-token.repository';
 import * as passwordHasher from '../services/password-hasher';
 import * as tokenService from '../services/token.service';
-import { RefreshToken } from '../../domain/entities/refresh-token.entity';
-import { Inject, Injectable, Session, UnauthorizedException } from '@nestjs/common';
+import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { AUTH_CREDENTIAL_REPOSITORY, AUTH_IDENTITY_REPOSITORY, AUTH_REPOSITORY, AUTH_SESSION_REPOSITORY, JWT_TOKEN_SERVICE, PASSWORD_HASHER, REFRESH_TOKEN_REPOSITORY, USER_REPOSITORY } from 'src/infrastructure/database/database.constants';
-import * as userRepository from 'src/modules/users/domain/user.repository';
 import * as authSessionRepository  from '../../domain/repositories/auth-session.repository';
 import * as authCredentialRepository  from '../../domain/repositories/auth-credential.repository';
 import * as authIdentityRepository from '../../domain/repositories/auth-identity.repository';
 import { appConfig } from 'src/config/app.config';
+import {AuthIdentityType} from 'src/modules/auth/constants/auth-identity.type.enum'
 @Injectable()
 export class LoginUseCase {
   constructor(
@@ -23,9 +21,12 @@ export class LoginUseCase {
   ) {}
 
   async execute(email: string, password: string, meta: { ip: string; userAgent: string }) {
-    const user = await this.identityRepo.findByProvider('EMAIL',email);
+    const user = await this.identityRepo.findByProvider(AuthIdentityType.EMAIL,email);
     if (!user || !user.id) {
       throw new UnauthorizedException('Invalid credentials');
+    }
+    if (!user.verified) {
+      throw new UnauthorizedException('Email not verified');
     }
     const authcredentials = await this.credentialRepo.findByIdentityId(user.id);
     if (!authcredentials || !authcredentials.passwordHash) {

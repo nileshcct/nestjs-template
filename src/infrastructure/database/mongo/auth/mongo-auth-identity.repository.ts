@@ -28,7 +28,19 @@ export class MongoAuthIdentityRepository
   async findByProvider(provider: string, providerUserId: string) {
     const doc = await this.model.findOne({ provider, providerUserId });
     return doc
-      ? { id: doc._id.toString(), userId: doc.userId.toString() }
+      ? { id: doc._id.toString(), userId: doc.userId.toString(), verified : doc.verified }
       : null;
+  }
+  async findByIdentifier( providerUserId: string) {
+    const doc = await this.model.findOne({ providerUserId });
+    return doc
+      ? { id: doc._id.toString(), userId: doc.userId.toString(), verified : doc.verified }
+      : null;
+  }
+  async markVerified(identityId: string) {
+    await this.model.updateOne(
+      { _id: new Types.ObjectId(identityId) },
+      { $set: { verified: true } },
+    );
   }
 }

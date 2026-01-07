@@ -1,0 +1,6 @@
+export enum VerificationTokenType {
+  EMAIL_VERIFY = 'EMAIL_VERIFY',
+  PHONE_VERIFY = 'PHONE_VERIFY',
+  EMAIL_CHANGE = 'EMAIL_CHANGE',
+  PHONE_CHANGE = 'PHONE_CHANGE',
+}

@@ -8,5 +8,10 @@ export interface AuthIdentityRepository {
   findByProvider(
     provider: string,
     providerUserId: string,
-  ): Promise<{ id: string; userId: string } | null>;
+  ): Promise<{ id: string; userId: string, verified: boolean } | null>;
+  findByIdentifier(
+    providerUserId: string,
+  ): Promise<{ id: string; userId: string, verified: boolean } | null>;
+
+  markVerified(identityId: string): Promise<void>;
 }

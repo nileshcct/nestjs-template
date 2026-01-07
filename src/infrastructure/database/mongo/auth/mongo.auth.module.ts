@@ -4,12 +4,13 @@ import { AuthCredential, AuthCredentialSchema } from '../schemas/auth/auth-crede
 import { AuthIdentity, AuthIdentitySchema } from '../schemas/auth/auth-identity.schema';
 import { AuthSession, AuthSessionSchema } from '../schemas/auth/auth-session.schema';
 import { RefreshToken, RefreshTokenSchema } from '../schemas/auth/refresh-token.schema';
-
 import {MongoAuthCredentialRepository} from './mongo-auth-credential.repository'
 import {MongoAuthIdentityRepository} from './mongo-auth-identity.repository'
 import {MongoAuthSessionRepository} from './mongo-auth-session.repository'
 import {MongoRefreshTokenRepository} from './mongo-refresh-token.repository'
-import { AUTH_REPOSITORY, REFRESH_TOKEN_REPOSITORY, USER_REPOSITORY, AUTH_CREDENTIAL_REPOSITORY,AUTH_IDENTITY_REPOSITORY, AUTH_SESSION_REPOSITORY } from '../../database.constants';
+import {  REFRESH_TOKEN_REPOSITORY, AUTH_CREDENTIAL_REPOSITORY,AUTH_IDENTITY_REPOSITORY, AUTH_SESSION_REPOSITORY, AUTH_VERIFICATION_TOKEN_REPOSITORY } from '../../database.constants';
+import { AuthVerificationToken, AuthVerificationTokenSchema } from '../schemas/auth/auth-verification-token.schema';
+import { MongoAuthVerificationTokenRepository } from './mongo-auth-verification-token.repository';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { AUTH_REPOSITORY, REFRESH_TOKEN_REPOSITORY, USER_REPOSITORY, AUTH_CREDEN
       { name: AuthCredential.name, schema: AuthCredentialSchema },
       { name: AuthIdentity.name, schema: AuthIdentitySchema },
       { name: AuthSession.name, schema: AuthSessionSchema },
+      { name: AuthVerificationToken.name, schema: AuthVerificationTokenSchema },
       { name: RefreshToken.name, schema: RefreshTokenSchema },
     ]),
   ],
@@ -34,11 +36,15 @@ import { AUTH_REPOSITORY, REFRESH_TOKEN_REPOSITORY, USER_REPOSITORY, AUTH_CREDEN
       useClass: MongoAuthSessionRepository,
     },
     {
+      provide: AUTH_VERIFICATION_TOKEN_REPOSITORY,
+      useClass: MongoAuthVerificationTokenRepository,
+    },
+    {
       provide: REFRESH_TOKEN_REPOSITORY,
       useClass: MongoRefreshTokenRepository,
     },
   ],
-  exports: [REFRESH_TOKEN_REPOSITORY, AUTH_CREDENTIAL_REPOSITORY, AUTH_IDENTITY_REPOSITORY, AUTH_SESSION_REPOSITORY],
+  exports:  [AUTH_CREDENTIAL_REPOSITORY, AUTH_IDENTITY_REPOSITORY, AUTH_SESSION_REPOSITORY, AUTH_VERIFICATION_TOKEN_REPOSITORY, REFRESH_TOKEN_REPOSITORY],
 })
 
 export class MongoAuthModule {}
