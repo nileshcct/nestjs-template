@@ -7,6 +7,7 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
 import { SuccessResponseInterceptor } from './common/interceptors/success-response.interceptor';
 import { AuthModule } from './modules/auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
+import { CommonModule } from './common/common.module';
 
 @Module({
   imports: [
@@ -15,7 +16,8 @@ import { ConfigModule } from '@nestjs/config';
     }),
     DatabaseModule.forRoot(),
     AuthModule,
-    UserModule
+    UserModule,
+    CommonModule,
   ],
   controllers: [AppController],
   providers: [AppService, {

@@ -7,6 +7,8 @@ export type UserDocument = User & Document;
 @Schema({
   collection: COLLECTIONS.USERS,
   timestamps: true,
+  toJSON: { virtuals: true },     // ← Important
+  toObject: { virtuals: true },   // ← Important
 })
 export class User {
   @Prop()

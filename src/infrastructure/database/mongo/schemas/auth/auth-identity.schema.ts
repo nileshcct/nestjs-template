@@ -22,7 +22,7 @@ export class AuthIdentity {
   })
   provider: string;
 
-  @Prop({ required: true })
+  @Prop({ required: true, unique: true })
   providerUserId: string;
   
  @Prop({ type: Boolean, default: false })
