@@ -1,20 +1,25 @@
-import { PASSWORD_HASHER, REFRESH_TOKEN_REPOSITORY } from 'src/infrastructure/database/database.constants';
+import { AUTH_SESSION_REPOSITORY, REFRESH_TOKEN_REPOSITORY } from 'src/infrastructure/database/database.constants';
 import * as refreshTokenRepository from '../../domain/repositories/refresh-token.repository';
-import * as passwordHasher from '../services/password-hasher';
 import { Inject } from '@nestjs/common';
+import * as authSessionRepository  from '../../domain/repositories/auth-session.repository';
 
 export class LogoutUseCase {
   constructor(
+    @Inject(AUTH_SESSION_REPOSITORY) private readonly authSessionRepo : authSessionRepository.AuthSessionRepository ,
+    
     @Inject(REFRESH_TOKEN_REPOSITORY) private readonly refreshTokenRepo: refreshTokenRepository.RefreshTokenRepository,
-    @Inject(PASSWORD_HASHER) private readonly passwordHasher: passwordHasher.PasswordHasher,
   ) {}
 
-  //  async execute(sessionId: string): Promise<void> {
-  //   // 1. Revoke refresh tokens for this session
-  //   await this.refreshTokenRepo.revokeBySessionId(sessionId);
+   async execute(sessionId: string): Promise<void> {
+     // defensive — should never happen
+    if (!sessionId) {
+      return;
+    }
+    // Revoke refresh tokens for this session
+    await this.refreshTokenRepo.revokeSession(sessionId);
 
-  //   // 2. Revoke session
-  //   await this.sessionRepo.revoke(sessionId);
-  // }
+    // Revoke session
+    await this.authSessionRepo.revoke(sessionId);
+  }
 }
 

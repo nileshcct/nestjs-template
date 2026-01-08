@@ -11,11 +11,19 @@ import { PASSWORD_HASHER, JWT_TOKEN_SERVICE, SEND_VERIFICATION_TOKEN_SERVICE } f
 import { JwtTokenService } from 'src/infrastructure/jwt/jwt-token.service';
 import { UserModule } from '../users/users.module';
 import { SendVerificationTokenService } from './application/services/send-verification-token.service';
+import { JwtModule } from '@nestjs/jwt';
+import { appConfig } from 'src/config/app.config';
 
 @Module({
-  imports : [UserModule],
+  imports : [
+    UserModule, 
+    JwtModule.register({
+    global: true,
+    secret: appConfig.auth.accessToken.secret,
+    signOptions: { expiresIn: '60s' },
+    })],
   controllers: [AuthController],
-  providers: [AuthService,  
+  providers: [ 
     {
       provide: PASSWORD_HASHER,
       useClass: BcryptPasswordHasher,
@@ -28,6 +36,7 @@ import { SendVerificationTokenService } from './application/services/send-verifi
       provide: JWT_TOKEN_SERVICE,
       useClass: JwtTokenService,
     }, 
-    RegisterUseCase, RefreshTokenUseCase, LoginUseCase, VerifyOtpUseCase, LogoutUseCase]
+     AuthService, RegisterUseCase, RefreshTokenUseCase, LoginUseCase, VerifyOtpUseCase, LogoutUseCase
+  ],
 })
 export class AuthModule {}

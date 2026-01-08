@@ -39,4 +39,10 @@ export class MongoRefreshTokenRepository
       ? { sessionId: doc.sessionId.toString(), tokenHash: doc.tokenHash, expiresAt: doc.expiresAt, revoked: doc.revoked }
       : null;
   }
+  async revokeSession(sessionId: string): Promise<void> {
+    await this.model.updateMany(
+      { sessionId: new Types.ObjectId(sessionId) },
+      { revoked: true },
+    );
+  }
 }

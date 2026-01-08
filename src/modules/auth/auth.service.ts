@@ -33,7 +33,7 @@ export class AuthService {
   async verify(dto: VerifyAuthDto): Promise<any> {
     return this.verifyOtpUseCase.execute(dto);
   }
-  // async logout(refreshToken: string): Promise<void> {
-  //   await this.logoutUseCase.execute(refreshToken);
-  // }
+  async logout(sessionId: string): Promise<void> {
+    await this.logoutUseCase.execute(sessionId);
+  }
 }

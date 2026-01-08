@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Req } from '@nestjs/common';
 import { UsersService } from 'src/modules/users/users.service';
 import { SuccessMessage } from 'src/common/decorators/success-message.decorator';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -8,7 +8,7 @@ export class UsersController {
   constructor(private readonly userService: UsersService) {}
   @Get(':id')
   @SuccessMessage('User fetched successfully.')
-  async get(@Param('id') id: string) {
+  async get(@Param('id') id: string, @Req() req : Request) {
     return await this.userService.getUser(id);
   }
 

@@ -10,4 +10,5 @@ export interface RefreshTokenRepository {
   findByJti(jti: string): Promise<{
     expiresAt: Date; sessionId: string; tokenHash: string; revoked: boolean;
 } | null>;
+ revokeSession(sessionId: string): Promise<void>;
 }

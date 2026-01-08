@@ -2,11 +2,10 @@ import {
   Body,
   Controller,
   Post,
-  UsePipes,
-  ValidationPipe,
   HttpCode,
   HttpStatus,
   Req,
+  UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
@@ -14,13 +13,13 @@ import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { RegisterDto } from './dto/register.dto';
 import type { Request } from 'express';
 import { VerifyAuthDto } from './dto/verify-auth.dto';
+import { Public } from 'src/common/decorators/public.decorator';
+import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 
 @Controller('auth')
-@UsePipes(new ValidationPipe({ whitelist: true }))
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
-
-
+  @Public()
   @Post('login')
   @HttpCode(HttpStatus.OK)
   async login(
@@ -32,26 +31,30 @@ export class AuthController {
       userAgent: req.headers['user-agent'] ?? 'unknown',
     });
   }
-
+   @Public()
    @Post('register')
   register(@Body() registerDto: RegisterDto) {
     return this.authService.register(registerDto);
   }
-
+  @Public()
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
   async refresh(@Body() { refreshToken }: RefreshTokenDto): Promise<any> {
     return this.authService.refreshToken(refreshToken);
   }
-    @Post('verify')
+  @Public()
+  @Post('verify')
   async verify(@Body() dto: VerifyAuthDto) {
     await this.authService.verify(dto);
   }
-  // @Post('logout')
-  // @HttpCode(204)
-  // async logout(@Req() req: any): Promise<{ message: string }> {
-  //   const sessionId = req.user.sid
-  //   await this.authService.logout(sessionId); // Optional: blacklist jti if needed
-  //   return { message: 'Logged out successfully' };
-  // }
+  // PROTECTED ONLY ROUTE
+  @UseGuards(JwtAuthGuard)
+  @Post('logout')
+  @HttpCode(204)
+  async logout(@Req() req: any): Promise<{ message: string }> {
+    const sessionId = req.user.sid;
+    console.log('sessionId:', sessionId);
+    await this.authService.logout(sessionId); // Optional: blacklist jti if needed
+    return { message: 'Logged out successfully' };
+  }
 }
