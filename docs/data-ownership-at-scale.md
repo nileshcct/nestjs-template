@@ -1,135 +1,161 @@
-# Database Design: Ownership & Authorization at Scale
 
-## The Golden Rule of Ownership in Production Databases
+# Ownership, Authorization, and Why `userId` Still Exists at Scale
 
-**If a resource can be owned by a user/account, the database itself must be able to prove ownership in a single query.**
+This README explains **why serious systems denormalize ownership**, why **`userId` (or `accountId`) is stored everywhere**, and how real-world platforms like Amazon / Flipkart / Shopify think about authorization.
 
-This is not optional once you care about:
+No fluff. Just the rules that survive scale.
 
-- Security
-- Performance at scale
-- Correct authorization
-- Avoiding subtle data leaks
+---
 
-## Catalog / System-owned entities (global – no ownership)
+## 1. System-Owned vs User-Owned Data
 
-These usually **do NOT** need `userId` / `accountId`:
+Some resources are **catalog / system-owned**.  
+Everyone can see them. Nobody “owns” them.
 
-```text
-Product
-Category
-Brand
-Inventory (global stock)
-Promotion / Coupon rules
-TaxRule
-```
+Examples:
 
-→ Everyone (or large groups) can see them → no per-user ownership filter needed.
+- Product  
+- Category  
+- Brand  
+- Inventory  
+- Promotion  
+- TaxRule  
 
-## User-owned or Account-owned entities (MUST have ownership field)
+These **do NOT need `userId`**.
 
-```text
-orders
-payments
-carts / wishlists
-addresses
-saved payment methods
-reviews (sometimes)
-return requests
-subscriptions
-```
+If access is global, ownership is irrelevant.
 
-**Anti-patterns that WILL hurt you at scale**
+---
 
-```text
--- Looks clean but dangerous
-SELECT * FROM orders 
-WHERE id = ? 
--- and you check in code: if order.user_id == current_user.id
-```
+## 2. The Moment Ownership Appears, Everything Changes
 
-Why this is bad:
+The moment a resource is **user-owned**, the database must be able to answer:
 
-1. You forgot the check once → data leak
-2. You can't efficiently shard by user
-3. Every query needs application-level filtering
-4. Hard to audit / reason about access control
+> “Does this user (or account) own this row?”
 
-## What big companies (Amazon, Flipkart, Shopify, etc.) actually do
+And it must answer that in **O(1)**.
 
-They **intentionally denormalize** ownership:
+Not:
+- after joins  
+- not after service-layer filtering  
+- not after frontend validation  
 
-```sql
-CREATE TABLE orders (
-    id              BIGINT          PRIMARY KEY,
-    account_id      BIGINT          NOT NULL,     ← true owner
-    created_by      BIGINT,                       ← who actually created (audit)
-    user_id         BIGINT,                       ← sometimes kept for convenience
-    ...
-    INDEX idx_account_orders (account_id, created_at DESC)
-);
-```
+**At the database level. In one query.**
 
-```sql
--- Super fast & secure authorization pattern
-SELECT * FROM orders
-WHERE id = ?
-  AND account_id = ?   ← current user's account
-```
+---
 
-→ O(1) authorization check directly in the database
-→ Impossible to forget the ownership check
-→ Works great with sharding (account_id → shard key)
-→ Row-level security friendly
+## 3. Why Big Companies Store `userId` Everywhere
 
-## Evolution: From single-user to multi-user / organization accounts
+Amazon / Flipkart / Shopify logic is brutal and correct:
 
-**Phase 1 – Simple apps**  
-One user = one owner  
-→ `user_id` everywhere is fine
+- Authorization must be **O(1)**
+- Joins are **expensive at scale**
+- Guards are **not enough**
+- The **DB query itself must prove ownership**
 
-**Phase 2 – Real growth**  
-One account can have multiple users (team, family, employees, sub-accounts)
+So they **denormalize intentionally**.
 
-```diff
-- user_id          BIGINT NOT NULL
-+ account_id        BIGINT NOT NULL
-+ created_by        BIGINT           -- optional: the actual user who performed action
-+ updated_by        BIGINT           -- optional
-```
+### Why?
+- Storage is cheap
+- Latency is not
+- Security bugs are catastrophic
 
-**Recommended modern structure (2024–2026 best practice):**
+---
 
-```sql
--- Core ownership
-account_id      BIGINT NOT NULL     -- The real owner / tenant
+## 4. “We Don’t Store userId” — What That Actually Means
 
--- Audit trail (very useful, low cost)
-created_by      BIGINT              -- user who created
-created_at      TIMESTAMP
-updated_by      BIGINT              -- last user who updated
-updated_at      TIMESTAMP
+If someone says _“we don’t store userId”_, they are doing one of these:
 
--- Optional convenience (use carefully)
-user_id         BIGINT              -- only if 95%+ cases it's same as created_by
-```
+1. **Relying on joins**  
+   → Slow, complex, fragile at scale  
 
-## Summary – Quick Decision Table
+2. **Filtering in code**  
+   → Classic security bug  
 
-| Entity Type               | Needs `account_id` / `tenant_id` ? | Needs `user_id` ?         | Typical Index                              |
-|---------------------------|-------------------------------------|----------------------------|--------------------------------------------|
-| Product, Category, Brand  | No                                  | No                         | —                                          |
-| Global promotions, taxes  | No                                  | No                         | —                                          |
-| Order, Payment, Refund    | **YES**                             | Optional (audit)           | (account_id, created_at)                   |
-| Cart                      | **YES**                             | Optional                   | (account_id)                               |
-| Address, Saved Card       | **YES**                             | Optional                   | (account_id, type, is_default)             |
-| User profile              | No (but user_id is PK)              | —                          | —                                          |
+3. **Trusting the frontend**  
+   → Instant vulnerability  
 
-## Final Advice
+4. **They haven’t hit scale yet**  
+   → The bill always comes later  
 
-```text
-Storage is cheap.
-Latency is expensive.
-Security bugs are catastrophic.
+There is no fifth option.
 
-Denormalize ownership early.
+---
+
+## 5. The Golden Rule (Read This Twice)
+
+> **If a resource is user-owned, the database must be able to prove ownership directly.**
+
+That means:
+
+- `userId`
+- OR something that deterministically resolves to it
+- **In ONE query**
+
+No joins. No guessing. No assumptions.
+
+---
+
+## 6. What Must Always Have Ownership
+
+These are **not optional**:
+
+Add `userId` (or equivalent) to:
+
+- orders
+- payments
+- carts
+- addresses
+
+Even if you *think* you don’t need it today.
+
+You will.
+
+---
+
+## 7. When One Company Has Multiple Users
+
+This is where most systems grow up.
+
+Once a user can invite another user:
+
+`userId` is no longer the owner  
+ The owner becomes an **account / organization / tenant**
+
+### The real model:
+
+- One **account** → many users
+- One **account** → all business data
+
+Users act **on behalf of** the account.
+
+---
+
+## 8. Correct Ownership Model
+
+```ts
+Order {
+  _id
+  accountId   // REAL ownership (required)
+  createdBy   // userId (optional, audit only)
+}
+````
+
+### Why this works
+
+* Authorization checks use `accountId`
+* Multi-user access is natural
+* Auditing still knows *who* acted
+* Queries stay fast
+* Security stays boring (that’s good)
+
+---
+
+## 9. Conclusion
+* `userId` is **not about relationships**
+* It is about **authorization**
+* Ownership must be **provable at the database level**
+* Denormalization is not bad design — **it’s survival**
+
+If your DB cannot prove ownership in one query,
+your system is already broken — it just doesn’t know it yet.
