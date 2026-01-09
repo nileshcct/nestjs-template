@@ -14,4 +14,5 @@ export interface AuthIdentityRepository {
   ): Promise<{ id: string; userId: string, verified: boolean } | null>;
 
   markVerified(identityId: string): Promise<void>;
+  deleteByUserId(userId: string): Promise<void>;
 }

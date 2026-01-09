@@ -13,6 +13,9 @@ export class RefreshToken {
   @Prop({ type: Types.ObjectId, ref: COLLECTIONS.AUTH_SESSIONS, required: true })
   sessionId: Types.ObjectId;
 
+  @Prop({ type: Types.ObjectId, ref: COLLECTIONS.USERS, required: true })
+  userId: Types.ObjectId;
+
   @Prop({ required: true })
   jti: string;
 

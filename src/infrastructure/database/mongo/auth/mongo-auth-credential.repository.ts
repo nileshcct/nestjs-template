@@ -12,10 +12,12 @@ export class MongoAuthCredentialRepository
   ) {}
 
   async create(data: {
+    userId: string;
     identityId: string;
     passwordHash: string;
   }) {
     await this.model.create({
+      userId: new Types.ObjectId(data.userId),
       identityId: new Types.ObjectId(data.identityId),
       passwordHash: data.passwordHash,
     });
@@ -27,5 +29,8 @@ export class MongoAuthCredentialRepository
     });
 
     return doc ? { passwordHash: doc.passwordHash } : null;
+  }
+  async deleteByUserId(userId: string): Promise<void> {
+    await this.model.deleteMany({ userId: new Types.ObjectId(userId) });
   }
 }

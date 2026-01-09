@@ -1,9 +1,9 @@
 import { AUTH_SESSION_REPOSITORY, JWT_TOKEN_SERVICE, PASSWORD_HASHER, REFRESH_TOKEN_REPOSITORY } from 'src/infrastructure/database/database.constants';
-import * as refreshTokenRepository from '../../domain/repositories/refresh-token.repository';
 import * as passwordHasher from '../services/password-hasher';
 import * as tokenService from '../services/token.service';
 import { Inject, UnauthorizedException } from '@nestjs/common';
 import * as authSessionRepository  from '../../domain/repositories/auth-session.repository';
+import * as refreshTokenRepository from '../../domain/repositories/refresh-token.repository';
 import { appConfig } from 'src/config/app.config';
 
 export class RefreshTokenUseCase {
@@ -44,6 +44,7 @@ export class RefreshTokenUseCase {
     {
       jti: jti_id,
       sessionId : storedToken.sessionId,
+      userId: session.userId,
       tokenHash: newRefreshTokenHash,
       expiresAt: new Date(Date.now() + appConfig.auth.refreshToken.ttlMs),
     }

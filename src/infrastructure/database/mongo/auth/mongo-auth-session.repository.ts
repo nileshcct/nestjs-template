@@ -43,4 +43,7 @@ export class MongoAuthSessionRepository
       ? { userId: doc.userId.toString() }
       : null;
   }
+  async deleteByUserId(userId: string): Promise<void> {
+    await this.model.deleteMany({ userId: new Types.ObjectId(userId) });
+  }
 }

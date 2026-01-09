@@ -69,4 +69,7 @@ export class MongoAuthVerificationTokenRepository {
       { $set: { usedAt: new Date() } },
     );
   }
+  async deleteByUserId(userId: string): Promise<void> {
+    await this.model.deleteMany({ userId: new Types.ObjectId(userId) });
+  }
 }

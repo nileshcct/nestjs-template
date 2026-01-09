@@ -61,6 +61,7 @@ export class LoginUseCase {
     {
       jti,
       sessionId : session.id,
+      userId: user.userId,
       tokenHash: refreshTokenHash,
       expiresAt: new Date(Date.now() + appConfig.auth.refreshToken.ttlMs),
     }

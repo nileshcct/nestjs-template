@@ -9,4 +9,5 @@ export interface AuthSessionRepository {
   revoke(sessionId: string): Promise<void>;
 
   findById(sessionId: string): Promise<{ userId: string } | null>;
+  deleteByUserId(userId: string): Promise<void>;
 }

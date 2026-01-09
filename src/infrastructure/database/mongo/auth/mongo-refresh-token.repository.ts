@@ -13,12 +13,14 @@ export class MongoRefreshTokenRepository
 
   async create(data: {
     sessionId: string;
+    userId: string;
     jti: string;
     tokenHash: string;
     expiresAt: Date;
   }) {
     await this.model.create({
       sessionId: new Types.ObjectId(data.sessionId),
+      userId: new Types.ObjectId(data.userId),
       jti: data.jti,
       tokenHash: data.tokenHash,
       expiresAt: data.expiresAt,
@@ -36,7 +38,7 @@ export class MongoRefreshTokenRepository
     const doc = await this.model.findOne({ jti });
 
     return doc
-      ? { sessionId: doc.sessionId.toString(), tokenHash: doc.tokenHash, expiresAt: doc.expiresAt, revoked: doc.revoked }
+      ? { sessionId: doc.sessionId.toString(), userId : doc.userId.toString(), tokenHash: doc.tokenHash, expiresAt: doc.expiresAt, revoked: doc.revoked }
       : null;
   }
   async revokeSession(sessionId: string): Promise<void> {
@@ -44,5 +46,8 @@ export class MongoRefreshTokenRepository
       { sessionId: new Types.ObjectId(sessionId) },
       { revoked: true },
     );
+  }
+  async deleteByUserId(userId: string): Promise<void> {
+    await this.model.deleteMany({ userId: new Types.ObjectId(userId) });
   }
 }

@@ -45,6 +45,7 @@ export class RegisterUseCase {
     
     // Store credentials
     await this.credentialRepo.create({
+      userId: user.id,
       identityId: identity.id,
       passwordHash,
     });

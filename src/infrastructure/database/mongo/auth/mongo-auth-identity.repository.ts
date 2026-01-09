@@ -51,4 +51,7 @@ export class MongoAuthIdentityRepository
       { $set: { verified: true } },
     );
   }
+  async deleteByUserId(userId: string): Promise<void> {
+    await this.model.deleteMany({ userId: new Types.ObjectId(userId) });
+  }
 }
