@@ -6,8 +6,11 @@ import {
   HttpException,
   HttpStatus,
 } from '@nestjs/common';
+import { Logger } from 'nestjs-pino';
 @Catch()
 export class GlobalExceptionFilter implements ExceptionFilter {
+  constructor(private readonly logger: Logger) {}
+
   catch(exception: unknown, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse();
@@ -28,11 +31,14 @@ export class GlobalExceptionFilter implements ExceptionFilter {
         error = (res as any).error;
       }
     }
-      if (status >= 500) {
-      console.error('INTERNAL SERVER ERROR');
-      console.error('URL:', request.method, request.url);
-      console.error('Exception:', exception);
-    }
+      this.logger.error(
+      {
+        err: exception,
+        path: request.url,
+        method: request.method,
+      },
+      'Unhandled exception',
+    );
 
     response.status(status).json({
       statusCode: status,

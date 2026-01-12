@@ -6,6 +6,7 @@ import {
   HttpStatus,
   Req,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
@@ -15,8 +16,10 @@ import type { Request } from 'express';
 import { VerifyAuthDto } from './dto/verify-auth.dto';
 import { Public } from 'src/common/decorators/public.decorator';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
+// import { LoggingInterceptor } from 'src/common/interceptors/logging.interceptor';
 
 @Controller('auth')
+// @UseInterceptors(LoggingInterceptor)
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
   @Public()

@@ -8,6 +8,8 @@ import { SuccessResponseInterceptor } from './common/interceptors/success-respon
 import { AuthModule } from './modules/auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { CommonModule } from './common/common.module';
+import { LoggerModule } from './logger/logger.module';
+import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
 
 @Module({
   imports: [
@@ -18,11 +20,18 @@ import { CommonModule } from './common/common.module';
     AuthModule,
     UserModule,
     CommonModule,
+    LoggerModule
   ],
   controllers: [AppController],
-  providers: [AppService, {
+  providers: [AppService, 
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: LoggingInterceptor,
+    },
+    {
       provide: APP_INTERCEPTOR,
       useClass: SuccessResponseInterceptor,
-    },],
+    }
+  ],
 })
 export class AppModule {}
