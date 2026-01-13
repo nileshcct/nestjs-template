@@ -13,12 +13,14 @@ export class MongoAuthVerificationTokenRepository {
 
   async create(params: {
     identityId: Types.ObjectId;
+    userId: Types.ObjectId;
     type: VerificationTokenType;
     tokenHash: string;
     expiresAt: Date;
   }): Promise<AuthVerificationToken> {
     return this.model.create({
       identityId: params.identityId,
+      userId: params.userId,
       type: params.type,
       tokenHash: params.tokenHash,
       expiresAt: params.expiresAt,

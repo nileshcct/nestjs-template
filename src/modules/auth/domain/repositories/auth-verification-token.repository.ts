@@ -3,6 +3,7 @@ import { VerificationTokenType } from '../../constants/auth-verification-token-t
 export interface AuthVerificationTokenRepository {
   create(data: {
     identityId: string;
+    userId: string;
     type: VerificationTokenType;
     tokenHash: string;
     expiresAt: Date;

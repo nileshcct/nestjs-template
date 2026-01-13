@@ -1,0 +1,119 @@
+// This is your Prisma schema file,
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+  engineType = "node"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum AuthIdentityType {
+  EMAIL
+  PHONE
+  GOOGLE
+  GITHUB
+}
+
+enum VerificationTokenType {
+  EMAIL_VERIFY
+  PHONE_VERIFY
+  EMAIL_CHANGE
+  PHONE_CHANGE
+}
+
+
+model AuthCredential {
+  id            String   @id @default(uuid())
+  userId        String
+  identityId    String
+  passwordHash  String
+  algo          String   @default("argon2id")
+  lastRotatedAt DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([userId])
+  @@index([identityId])
+  @@map("auth_credentials")
+}
+
+model AuthIdentity {
+  id              String   @id @default(uuid())
+  userId          String
+  provider        String
+  providerUserId  String
+  verified        Boolean  @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([provider, providerUserId])
+  @@map("auth_identities")
+}
+
+model AuthSession {
+  id         String   @id @default(uuid())
+  userId     String
+  ipAddress  String?
+  userAgent  String?
+  expiresAt  DateTime
+  isRevoked  Boolean  @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@map("auth_sessions")
+}
+
+model AuthVerificationToken {
+  id         String                 @id @default(uuid())
+  identityId String
+  userId     String
+  type       VerificationTokenType
+  tokenHash  String
+  expiresAt  DateTime
+  usedAt     DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([identityId, type])
+  @@index([tokenHash, type])
+  @@map("auth_verification_tokens")
+}
+model RefreshToken {
+  id         String   @id @default(uuid())
+  sessionId  String
+  userId     String
+  jti        String   @unique
+  tokenHash  String   @unique
+  expiresAt  DateTime
+  revoked    Boolean  @default(false)
+
+  user User @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([sessionId])
+  @@index([userId])
+  @@map("refresh_tokens")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  age       Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  refreshTokens RefreshToken[]
+
+  @@map("users")
+}
+
+
+

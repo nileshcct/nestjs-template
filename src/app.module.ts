@@ -9,8 +9,6 @@ import { AuthModule } from './modules/auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { CommonModule } from './common/common.module';
 import { LoggerModule } from './logger/logger.module';
-import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
-
 @Module({
   imports: [
      ConfigModule.forRoot({
@@ -24,10 +22,6 @@ import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
   ],
   controllers: [AppController],
   providers: [AppService, 
-    {
-      provide: APP_INTERCEPTOR,
-      useClass: LoggingInterceptor,
-    },
     {
       provide: APP_INTERCEPTOR,
       useClass: SuccessResponseInterceptor,

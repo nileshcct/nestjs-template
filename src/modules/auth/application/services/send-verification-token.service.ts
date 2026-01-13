@@ -15,6 +15,7 @@ export class SendVerificationTokenService {
 
   async sendVerificationToken(params: {
     identityId: string;
+    userId: string;
     type: VerificationTokenType;
     destination: string;
   }) {
@@ -30,6 +31,7 @@ export class SendVerificationTokenService {
 
     await this.verificationTokenRepo.create({
       identityId: params.identityId,
+      userId: params.userId,
       type: params.type,
       tokenHash,
       expiresAt: new Date(Date.now() + 10 * 60 * 1000), // 10 min

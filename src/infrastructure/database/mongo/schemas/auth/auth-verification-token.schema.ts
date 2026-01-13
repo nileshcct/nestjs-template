@@ -12,6 +12,9 @@ export class AuthVerificationToken {
   @Prop({ type: Types.ObjectId, ref: COLLECTIONS.AUTH_IDENTITIES, required: true })
   identityId: Types.ObjectId;
 
+  @Prop({ type: Types.ObjectId, ref: COLLECTIONS.USERS, required: true })
+  userId: Types.ObjectId;
+
   @Prop({
     enum: VerificationTokenType,
     required: true,

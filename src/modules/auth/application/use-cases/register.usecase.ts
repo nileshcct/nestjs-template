@@ -52,6 +52,7 @@ export class RegisterUseCase {
 
       await this.sendVerificationTokenService.sendVerificationToken({
       identityId: identity.id,
+      userId: user.id,
       type: VerificationTokenType.EMAIL_VERIFY,
       destination: registerDto.email,
     });

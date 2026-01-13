@@ -6,8 +6,9 @@ import { CreateUserDto } from 'src/modules/users/dto/create-user.dto';
 import { User, UserDocument } from 'src/infrastructure/database/mongo/schemas/user/user.schema';
 import { UserMapper } from 'src/modules/users/users.mapper';
 import { UserNotFoundError } from 'src/modules/users/domain/errors/user-not-found.error';
-import { BadRequestException } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 
+@Injectable()
 export class MongoUserRepository implements UserRepository {
   constructor(
     @InjectModel(User.name)
