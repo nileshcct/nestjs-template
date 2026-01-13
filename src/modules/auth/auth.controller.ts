@@ -14,6 +14,7 @@ import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { RegisterDto } from './dto/register.dto';
 import type { Request } from 'express';
 import { VerifyAuthDto } from './dto/verify-auth.dto';
+import { ResendAuthDto } from './dto/resend-auth.dto';
 import { Public } from 'src/common/decorators/public.decorator';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 // import { LoggingInterceptor } from 'src/common/interceptors/logging.interceptor';
@@ -50,6 +51,13 @@ export class AuthController {
   async verify(@Body() dto: VerifyAuthDto) {
     await this.authService.verify(dto);
   }
+
+  @Public()
+  @Post('resend-verification')
+  async resendVerification(@Body() dto: ResendAuthDto) {
+    await this.authService.resendVerification(dto);
+  }
+
   // PROTECTED ONLY ROUTE
   @UseGuards(JwtAuthGuard)
   @Post('logout')

@@ -8,6 +8,8 @@ import { RegisterDto } from './dto/register.dto';
 import { LogoutUseCase } from './application/use-cases/logout.usecase';
 import { VerifyOtpUseCase } from './application/use-cases/verify-otp.usecase';
 import { VerifyAuthDto } from './dto/verify-auth.dto';
+import { ResendAuthDto } from './dto/resend-auth.dto';
+import {ResendOtpUseCase} from './application/use-cases/resend-otp.usecase';
 
 @Injectable()
 export class AuthService {
@@ -17,6 +19,7 @@ export class AuthService {
     private readonly refreshTokenUseCase: RefreshTokenUseCase,
     private readonly logoutUseCase: LogoutUseCase,
     private readonly verifyOtpUseCase: VerifyOtpUseCase,
+    private readonly resendOtpUseCase: ResendOtpUseCase,
   ) {}
 
   async login(dto: LoginDto, meta: { ip: string; userAgent: string }): Promise<AuthResponseDto> {
@@ -32,6 +35,9 @@ export class AuthService {
   }
   async verify(dto: VerifyAuthDto): Promise<any> {
     return this.verifyOtpUseCase.execute(dto);
+  }
+  async resendVerification(dto: ResendAuthDto): Promise<void> {
+    return this.resendOtpUseCase.execute(dto);
   }
   async logout(sessionId: string): Promise<void> {
     await this.logoutUseCase.execute(sessionId);

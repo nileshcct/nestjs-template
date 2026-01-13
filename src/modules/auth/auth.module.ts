@@ -13,6 +13,7 @@ import { UserModule } from '../users/users.module';
 import { SendVerificationTokenService } from './application/services/send-verification-token.service';
 import { JwtModule } from '@nestjs/jwt';
 import { appConfig } from 'src/config/app.config';
+import { ResendOtpUseCase } from './application/use-cases/resend-otp.usecase';
 
 @Module({
   imports : [
@@ -36,7 +37,7 @@ import { appConfig } from 'src/config/app.config';
       provide: JWT_TOKEN_SERVICE,
       useClass: JwtTokenService,
     }, 
-     AuthService, RegisterUseCase, RefreshTokenUseCase, LoginUseCase, VerifyOtpUseCase, LogoutUseCase
+     AuthService, RegisterUseCase, RefreshTokenUseCase, LoginUseCase, VerifyOtpUseCase, LogoutUseCase, ResendOtpUseCase
   ],
 })
 export class AuthModule {}
