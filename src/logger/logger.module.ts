@@ -12,7 +12,7 @@ import { LoggerModule as PinoLoggerModule } from 'nestjs-pino';
             {
               target: 'pino-pretty', // Install with: npm install pino-pretty
               options: { destination: 1 }, // 1 is stdout
-              level: 'info',
+              level: 'error',
             },
             // 2. Output to Local File with Rotation
             {
