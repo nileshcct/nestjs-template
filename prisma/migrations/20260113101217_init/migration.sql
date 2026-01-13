@@ -10,7 +10,7 @@ CREATE TABLE "auth_credentials" (
     "userId" TEXT NOT NULL,
     "identityId" TEXT NOT NULL,
     "passwordHash" TEXT NOT NULL,
-    "algo" TEXT NOT NULL DEFAULT 'argon2id',
+    "algo" TEXT NOT NULL DEFAULT 'bcrypt',
     "lastRotatedAt" TIMESTAMP(3),
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,

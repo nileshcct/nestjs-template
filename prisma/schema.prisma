@@ -29,7 +29,7 @@ model AuthCredential {
   userId        String
   identityId    String
   passwordHash  String
-  algo          String   @default("argon2id")
+  algo          String   @default("bcrypt")
   lastRotatedAt DateTime?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt

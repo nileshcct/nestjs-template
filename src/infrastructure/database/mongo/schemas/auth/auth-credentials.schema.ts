@@ -19,7 +19,7 @@ export class AuthCredential {
   @Prop({ required: true })
   passwordHash: string;
 
-  @Prop({ default: 'argon2id' })
+  @Prop({ default: 'bcrypt' })
   algo: string;
 
   @Prop()
