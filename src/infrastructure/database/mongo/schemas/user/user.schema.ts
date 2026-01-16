@@ -16,6 +16,9 @@ export class User {
   
   @Prop()
   age: number;
+
+  @Prop({ default: null }) // NEW FIELD
+  phone: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
