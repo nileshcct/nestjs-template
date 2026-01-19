@@ -12,7 +12,7 @@ export async function loadMigrations() {
     )
     .sort(); // important: deterministic order
 
-  const migrations: { name: string; up: Function }[] = [];
+  const migrations: { name: string; up: Function, down: Function }[] = [];
 
   for (const file of files) {
     const filePath = path.join(migrationsDir, file);
@@ -25,8 +25,8 @@ export async function loadMigrations() {
     migrations.push({
       name: file,
       up: migration.up,
+      down: migration.down,
     });
   }
-
   return migrations;
 }

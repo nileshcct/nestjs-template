@@ -42,4 +42,29 @@ export class AuthService {
   async logout(sessionId: string): Promise<void> {
     await this.logoutUseCase.execute(sessionId);
   }
+  //  async getRoleByKey(key: string) {
+  //   return this.roleModel.findOne({ key });
+  // }
+
+  // async getPermissionsForRole(roleId: string) {
+  //   const mappings = await this.rolePermissionModel
+  //     .find({ roleId })
+  //     .populate('permissionId');
+
+  //   return mappings.map((m: any) => m.permissionId);
+  // }
+
+  // async hasPermission(roleId: string, permissionKey: string) {
+  //   const permission = await this.permissionModel.findOne({
+  //     key: permissionKey,
+  //     deprecated: false,
+  //   });
+
+  //   if (!permission) return false;
+
+  //   return this.rolePermissionModel.exists({
+  //     roleId,
+  //     permissionId: permission._id,
+  //   });
+  // }
 }

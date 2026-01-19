@@ -115,5 +115,40 @@ model User {
   @@map("users")
 }
 
+model Permission {
+  id         String @id @default(uuid())
+  key        String @unique
+  domain     String
+  action     String
+  deprecated Boolean @default(false)
+
+  rolePermissions RolePermission[]
+  @@map("permissions")
+}
+
+model Role {
+  id          String @id @default(uuid())
+  key         String @unique
+  name        String
+  isSystem    Boolean @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  rolePermissions RolePermission[]
+  @@map("roles")
+}
+
+model RolePermission {
+  id           String @id @default(uuid())
+  roleId       String
+  permissionId String
+
+  role       Role       @relation(fields: [roleId], references: [id])
+  permission Permission @relation(fields: [permissionId], references: [id])
+
+  @@unique([roleId, permissionId])
+   @@map("role_permissions")
+}
+
 
 
