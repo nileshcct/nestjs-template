@@ -1,7 +1,9 @@
-// This is your Prisma schema file,
+// =======================
+// Prisma Generator
+// =======================
 generator client {
-  provider = "prisma-client-js"
-  output   = "../src/generated/prisma"
+  provider   = "prisma-client-js"
+  output     = "../src/generated/prisma"
   engineType = "node"
 }
 
@@ -9,6 +11,9 @@ datasource db {
   provider = "postgresql"
 }
 
+// =======================
+// Enums
+// =======================
 enum AuthIdentityType {
   EMAIL
   PHONE
@@ -23,42 +28,85 @@ enum VerificationTokenType {
   PHONE_CHANGE
 }
 
+// =======================
+// User
+// =======================
+model User {
+  id   String @id @default(uuid())
+  name String
+  age  Int
 
+  identities    AuthIdentity[]
+  credentials   AuthCredential[]
+  sessions      AuthSession[]
+  refreshTokens RefreshToken[]
+  userRoles     UserRole[]
+
+  createdAt              DateTime                @default(now())
+  updatedAt              DateTime                @updatedAt
+  authVerificationTokens AuthVerificationToken[]
+
+  @@map("users")
+}
+
+// =======================
+// Auth Identity
+// =======================
+model AuthIdentity {
+  id             String           @id @default(uuid())
+  userId         String
+  provider       AuthIdentityType
+  providerUserId String
+  verified       Boolean          @default(false)
+
+  user        User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  credentials AuthCredential[]
+  tokens      AuthVerificationToken[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([provider, providerUserId])
+  @@index([userId])
+  @@map("auth_identities")
+}
+
+// =======================
+// Auth Credential
+// =======================
 model AuthCredential {
-  id            String   @id @default(uuid())
+  id            String    @id @default(uuid())
   userId        String
   identityId    String
   passwordHash  String
-  algo          String   @default("bcrypt")
+  algo          String    @default("bcrypt")
   lastRotatedAt DateTime?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+
+  user     User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  identity AuthIdentity @relation(fields: [identityId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([userId])
   @@index([identityId])
   @@map("auth_credentials")
 }
 
-model AuthIdentity {
-  id              String   @id @default(uuid())
-  userId          String
-  provider        String
-  providerUserId  String
-  verified        Boolean  @default(false)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@unique([provider, providerUserId])
-  @@map("auth_identities")
-}
-
+// =======================
+// Auth Session
+// =======================
 model AuthSession {
-  id         String   @id @default(uuid())
-  userId     String
-  ipAddress  String?
-  userAgent  String?
-  expiresAt  DateTime
-  isRevoked  Boolean  @default(false)
+  id        String   @id @default(uuid())
+  userId    String
+  ipAddress String?
+  userAgent String?
+  expiresAt DateTime
+  isRevoked Boolean  @default(false)
+
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  refreshTokens RefreshToken[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -66,91 +114,119 @@ model AuthSession {
   @@map("auth_sessions")
 }
 
-model AuthVerificationToken {
-  id         String                 @id @default(uuid())
-  identityId String
-  userId     String
-  type       VerificationTokenType
-  tokenHash  String
-  expiresAt  DateTime
-  usedAt     DateTime?
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-
-  @@index([identityId, type])
-  @@index([tokenHash, type])
-  @@map("auth_verification_tokens")
-}
+// =======================
+// Refresh Token
+// =======================
 model RefreshToken {
-  id         String   @id @default(uuid())
-  sessionId  String
-  userId     String
-  jti        String   @unique
-  tokenHash  String   @unique
-  expiresAt  DateTime
-  revoked    Boolean  @default(false)
+  id        String   @id @default(uuid())
+  sessionId String
+  userId    String
+  jti       String   @unique
+  tokenHash String   @unique
+  expiresAt DateTime
+  revoked   Boolean  @default(false)
+
+  session AuthSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  user    User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-  user User @relation(fields: [userId], references: [id])
 
   @@index([sessionId])
   @@index([userId])
   @@map("refresh_tokens")
 }
 
-model User {
-  id        String   @id @default(uuid())
-  name      String
-  age       Int
+// =======================
+// Verification Tokens
+// =======================
+model AuthVerificationToken {
+  id         String                @id @default(uuid())
+  identityId String
+  userId     String
+  type       VerificationTokenType
+  tokenHash  String
+  expiresAt  DateTime
+  usedAt     DateTime?
+
+  identity AuthIdentity @relation(fields: [identityId], references: [id], onDelete: Cascade)
+  user     User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  refreshTokens RefreshToken[]
-
-  @@map("users")
+  @@index([identityId, type])
+  @@index([tokenHash, type])
+  @@map("auth_verification_tokens")
 }
 
-model Permission {
-  id         String @id @default(uuid())
-  key        String @unique
-  domain     String
-  action     String
-  version    Int @default(1)
-  deprecated Boolean @default(false)
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-
-  rolePermissions RolePermission[]
-  @@map("permissions")
-}
-
+// =======================
+// Role
+// =======================
 model Role {
-  id          String @id @default(uuid())
-  key         String @unique
+  id          String  @id @default(uuid())
+  key         String  @unique
   name        String
   description String?
   isSystem    Boolean @default(false)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  
+
   rolePermissions RolePermission[]
+  userRoles       UserRole[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   @@map("roles")
 }
 
+// =======================
+// Permission
+// =======================
+model Permission {
+  id         String  @id @default(uuid())
+  key        String  @unique
+  domain     String
+  action     String
+  version    Int     @default(1)
+  deprecated Boolean @default(false)
+
+  rolePermissions RolePermission[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("permissions")
+}
+
+// =======================
+// Role Permission
+// =======================
 model RolePermission {
   id           String @id @default(uuid())
   roleId       String
   permissionId String
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
 
   role       Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
   permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   @@unique([roleId, permissionId])
-   @@map("role_permissions")
+  @@map("role_permissions")
 }
 
+// =======================
+// User Role
+// =======================
+model UserRole {
+  id     String @id @default(uuid())
+  userId String
+  roleId String
 
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
 
+  @@unique([userId, roleId])
+  @@map("user_roles")
+}

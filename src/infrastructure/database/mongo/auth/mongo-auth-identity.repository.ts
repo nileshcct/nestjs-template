@@ -4,7 +4,7 @@ import { AuthIdentity } from '../schemas/auth/auth-identity.schema';
 import { AuthIdentityRepository } from 'src/modules/auth/domain/repositories/auth-identity.repository';
 import { isUniqueConstraintViolation } from 'src/infrastructure/errors/db-error.mapper';
 import { EmailAlreadyExistsError } from 'src/modules/users/domain/errors/email-already-exits.error';
-
+import { AuthIdentityType } from 'src/modules/auth/constants/auth-identity.type.enum';
 export class MongoAuthIdentityRepository
   implements AuthIdentityRepository
 {
@@ -15,7 +15,7 @@ export class MongoAuthIdentityRepository
 
   async create(data: {
     userId: string;
-    provider: string;
+    provider: AuthIdentityType;
     providerUserId: string;
   }) {
     try {
@@ -33,7 +33,7 @@ export class MongoAuthIdentityRepository
     }
   }
 
-  async findByProvider(provider: string, providerUserId: string) {
+  async findByProvider(provider: AuthIdentityType, providerUserId: string) {
     const doc = await this.model.findOne({ provider, providerUserId });
     return doc
       ? { id: doc._id.toString(), userId: doc.userId.toString(), verified : doc.verified }

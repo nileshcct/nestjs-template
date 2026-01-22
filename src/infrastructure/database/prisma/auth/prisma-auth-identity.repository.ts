@@ -3,6 +3,7 @@ import { AuthIdentityRepository } from 'src/modules/auth/domain/repositories/aut
 import { EmailAlreadyExistsError } from 'src/modules/users/domain/errors/email-already-exits.error';
 import { isUniqueConstraintViolation } from 'src/infrastructure/errors/db-error.mapper';
 import { Injectable } from '@nestjs/common';
+import { AuthIdentityType } from 'src/generated/prisma'
 
 @Injectable()
 export class PrismaAuthIdentityRepository
@@ -12,7 +13,7 @@ export class PrismaAuthIdentityRepository
 
   async create(data: {
     userId: string;
-    provider: string;
+    provider: AuthIdentityType;
     providerUserId: string;
   }) {
     try {
@@ -34,7 +35,7 @@ export class PrismaAuthIdentityRepository
     }
   }
 
-  async findByProvider(provider: string, providerUserId: string) {
+  async findByProvider(provider: AuthIdentityType, providerUserId: string) {
     const record = await this.prisma.authIdentity.findUnique({
       where: {
         provider_providerUserId: {
