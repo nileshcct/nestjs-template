@@ -45,7 +45,6 @@ model AuthIdentity {
   provider        String
   providerUserId  String
   verified        Boolean  @default(false)
-
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -60,7 +59,6 @@ model AuthSession {
   userAgent  String?
   expiresAt  DateTime
   isRevoked  Boolean  @default(false)
-
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -76,9 +74,8 @@ model AuthVerificationToken {
   tokenHash  String
   expiresAt  DateTime
   usedAt     DateTime?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
   @@index([identityId, type])
   @@index([tokenHash, type])
@@ -92,11 +89,10 @@ model RefreshToken {
   tokenHash  String   @unique
   expiresAt  DateTime
   revoked    Boolean  @default(false)
-
-  user User @relation(fields: [userId], references: [id])
-
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id])
 
   @@index([sessionId])
   @@index([userId])
@@ -120,7 +116,10 @@ model Permission {
   key        String @unique
   domain     String
   action     String
+  version    Int @default(1)
   deprecated Boolean @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
   rolePermissions RolePermission[]
   @@map("permissions")
@@ -130,6 +129,7 @@ model Role {
   id          String @id @default(uuid())
   key         String @unique
   name        String
+  description String?
   isSystem    Boolean @default(false)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -142,9 +142,11 @@ model RolePermission {
   id           String @id @default(uuid())
   roleId       String
   permissionId String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
-  role       Role       @relation(fields: [roleId], references: [id])
-  permission Permission @relation(fields: [permissionId], references: [id])
+  role       Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
 
   @@unique([roleId, permissionId])
    @@map("role_permissions")

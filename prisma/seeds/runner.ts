@@ -1,26 +1,26 @@
 import 'dotenv/config';
 import { loadSeeds } from './index';
 import { PrismaClient } from 'src/generated/prisma';
+// import { PrismaClient } from '@prisma/client';
+import { PrismaPg } from '@prisma/adapter-pg';
+import { Pool } from 'pg';
+
 
 async function seedAll() {
-  if (!process.env.DATABASE_URL) {
+  // const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
+  const DATABASE_URL = process.env.DATABASE_URL
+  if (!DATABASE_URL) {
     throw new Error('DATABASE_URL not defined');
   }
 
+   const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+    const adapter = new PrismaPg(pool);
+
 
   // Explicitly pass the connection string to the constructor
-  const prisma = new PrismaClient(
-  // Todo - unable to connect to databse issue 
-  //   {
-  //   datasources: {
-  //     db: {
-  //       url: process.env.DATABASE_URL,
-  //     },
-  //   },
-  // }
-);
-
-  // const prisma = new PrismaClient();
+  const prisma = new PrismaClient({
+  adapter,
+});
 
   try {
     const seeds = await loadSeeds();
