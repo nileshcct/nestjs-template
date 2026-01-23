@@ -9,6 +9,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { CommonModule } from './common/common.module';
 import { LoggerModule } from './logger/logger.module';
+import { AuthorizationModule } from './modules/authorization/authorization.module';
 @Module({
   imports: [
      ConfigModule.forRoot({
@@ -16,6 +17,7 @@ import { LoggerModule } from './logger/logger.module';
     }),
     DatabaseModule.forRoot(),
     AuthModule,
+    AuthorizationModule,
     UserModule,
     CommonModule,
     LoggerModule
