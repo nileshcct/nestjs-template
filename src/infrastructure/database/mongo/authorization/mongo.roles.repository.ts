@@ -15,11 +15,13 @@ export class MongoRoleRepository implements RoleRepository {
   // Create role
   // =====================
   async create(data: {
+    name: string
     key: string
     description?: string
   }): Promise<Role> {
     try {
       const role = await this.roleModel.create({
+        name : data.name,
         key: data.key.toUpperCase(),
         description: data.description,
       })
