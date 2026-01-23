@@ -1,9 +1,9 @@
 
 import { model } from 'mongoose';
 import { COLLECTIONS } from 'src/infrastructure/database/constants/collections';
-import { Permission, PermissionSchema } from 'src/infrastructure/database/mongo/schemas/auth/permission.schema';
-import { Role, RoleSchema } from 'src/infrastructure/database/mongo/schemas/auth/role.schema';
-import { RolePermission, RolePermissionSchema } from 'src/infrastructure/database/mongo/schemas/auth/role-permission.schema';
+import { Permission, PermissionSchema } from 'src/infrastructure/database/mongo/schemas/authorization/permission.schema';
+import { Role, RoleSchema } from 'src/infrastructure/database/mongo/schemas/authorization/roles.schema';
+import { RolePermission, RolePermissionSchema } from 'src/infrastructure/database/mongo/schemas/authorization/role-permissions.schema';
 
 
 const RoleModel = model<Role>(COLLECTIONS.ROLES, RoleSchema);

@@ -1,6 +1,6 @@
 import { model } from 'mongoose';
 import { COLLECTIONS } from 'src/infrastructure/database/constants/collections';
-import { Role, RoleSchema } from 'src/infrastructure/database/mongo/schemas/auth/role.schema';
+import { Role, RoleSchema } from 'src/infrastructure/database/mongo/schemas/authorization/roles.schema';
 
 const RoleModel = model<Role>(COLLECTIONS.ROLES, RoleSchema);
 export async function run() {

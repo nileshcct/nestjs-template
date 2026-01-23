@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
-import { Role } from './role.schema';
+import { Role } from './roles.schema';
 import { Permission } from './permission.schema';
 import { COLLECTIONS } from 'src/infrastructure/database/constants/collections';
 

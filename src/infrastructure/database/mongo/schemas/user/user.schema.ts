@@ -1,14 +1,12 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
-import { COLLECTIONS } from '../../../constants/collections';
+import { COLLECTIONS } from 'src/infrastructure/database/constants/collections';
 
 export type UserDocument = User & Document;
 
 @Schema({
   collection: COLLECTIONS.USERS,
   timestamps: true,
-  toJSON: { virtuals: true },     // ← Important
-  toObject: { virtuals: true },   // ← Important
 })
 export class User {
   @Prop()

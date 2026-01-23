@@ -1,7 +1,7 @@
 
 import { model } from 'mongoose';
 import { COLLECTIONS } from 'src/infrastructure/database/constants/collections';
-import { Permission, PermissionSchema } from 'src/infrastructure/database/mongo/schemas/auth/permission.schema';
+import { Permission, PermissionSchema } from 'src/infrastructure/database/mongo/schemas/authorization/permission.schema';
 
 const PermissionModel = model<Permission>(COLLECTIONS.PERMISSIONS, PermissionSchema);
 export async function run() {
