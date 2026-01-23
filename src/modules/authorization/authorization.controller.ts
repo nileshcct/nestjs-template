@@ -1,4 +1,4 @@
-import { Controller, Post, Delete, Get, Param, UseGuards } from '@nestjs/common';
+import { Controller, Post, Delete, Get, Param } from '@nestjs/common';
 import { AuthorizationService } from './authorization.service';
 import { RequirePermissions } from 'src/common/decorators/permission.decorator';
 import { Permissions } from 'src/modules/authorization/constants/permission.constants';
@@ -10,7 +10,7 @@ export class AuthorizationController {
   ) {}
 
   // =====================
-  // USER ↔ ROLE
+  // USER <=> ROLE
   // =====================
   @Post('users/:userId/roles/:roleId')
   assignRoleToUser(
@@ -34,7 +34,7 @@ export class AuthorizationController {
   }
 
   // =====================
-  // ROLE ↔ PERMISSION
+  // ROLE <=> PERMISSION
   // =====================
   @Post('roles/:roleId/permissions/:permissionId')
   assignPermissionToRole(
@@ -64,7 +64,7 @@ export class AuthorizationController {
   }
 
   // =====================
-  // USER → PERMISSIONS
+  // USER => PERMISSIONS
   // =====================
   @Get('users/:userId/permissions')
   getUserPermissions(@Param('userId') userId: string) {

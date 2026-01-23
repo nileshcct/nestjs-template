@@ -20,7 +20,6 @@ export class UsersController {
   @Get()
   @SuccessMessage('User fetched successfully.')
   async get(@CurrentUser() user : {sub : string}) {
-    console.log('user :>> ', user);
     return await this.userService.getUser(user.sub);
   }
 

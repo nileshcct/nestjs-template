@@ -100,7 +100,7 @@ import { seedFeatureFlags } from './feature-flags.seed';
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log('🌱 Seeding database...');
+  console.log('Seeding database...');
 
   await seedRoles(prisma);
   await seedUsers(prisma);

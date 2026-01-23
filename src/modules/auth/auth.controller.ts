@@ -17,10 +17,8 @@ import { VerifyAuthDto } from './dto/verify-auth.dto';
 import { ResendAuthDto } from './dto/resend-auth.dto';
 import { Public } from 'src/common/decorators/public.decorator';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
-// import { LoggingInterceptor } from 'src/common/interceptors/logging.interceptor';
 
 @Controller('auth')
-// @UseInterceptors(LoggingInterceptor)
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
   @Public()
@@ -64,7 +62,6 @@ export class AuthController {
   @HttpCode(204)
   async logout(@Req() req: any): Promise<{ message: string }> {
     const sessionId = req.user.sid;
-    console.log('sessionId:', sessionId);
     await this.authService.logout(sessionId); // Optional: blacklist jti if needed
     return { message: 'Logged out successfully' };
   }

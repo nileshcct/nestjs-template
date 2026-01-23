@@ -15,7 +15,7 @@ export class AuthorizationService {
   ) {}
 
   // =====================
-  // USER ↔ ROLE
+  // USER <=> ROLE
   // =====================
   async assignRoleToUser(userId: string, roleId: string): Promise<void> {
     await this.userRoleRepo.assignRole(userId, roleId)
@@ -30,7 +30,7 @@ export class AuthorizationService {
   }
 
   // =====================
-  // ROLE ↔ PERMISSION
+  // ROLE <=> PERMISSION
   // =====================
   async assignPermissionToRole(
     roleId: string,
@@ -51,7 +51,7 @@ export class AuthorizationService {
   }
 
   // =====================
-  // USER → PERMISSIONS (resolved)
+  // USER => PERMISSIONS (resolved)
   // =====================
   async getUserPermissionIds(userId: string): Promise<string[]> {
     const roleIds = await this.userRoleRepo.findRoleIdsByUserId(userId)
@@ -65,11 +65,11 @@ export class AuthorizationService {
     return [...new Set(permissionSets.flat())]
   }
    async getUserPermissionKeys(userId: string): Promise<string[]> {
-    // 1. user → roles
+    // 1. user => roles
     const roleIds = await this.userRoleRepo.findRoleIdsByUserId(userId)
     if (roleIds.length === 0) return []
 
-    // 2. roles → permissionIds
+    // 2. roles => permissionIds
     const permissionIdSets = await Promise.all(
       roleIds.map(roleId =>
         this.rolePermissionRepo.findPermissionIdsByRoleId(roleId),
@@ -79,7 +79,7 @@ export class AuthorizationService {
     const permissionIds = [...new Set(permissionIdSets.flat())]
     if (permissionIds.length === 0) return []
 
-    // 3. permissionIds → permission KEYS
+    // 3. permissionIds => permission KEYS
     const permissions = await Promise.all(
       permissionIds.map(id => this.permissionRepo.findById(id)),
     )

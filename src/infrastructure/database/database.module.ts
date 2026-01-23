@@ -7,7 +7,6 @@ import {PrismaDatabaseModule} from './prisma/prisma.module';
 export class DatabaseModule {
   static forRoot(): DynamicModule {
     const databaseType = process.env.DATABASE_TYPE?.toLowerCase() || 'mongo';
-    console.log('process.env.DATABASE_TYPE :>> ', process.env.DATABASE_TYPE);
     console.log('databaseType :>> ', databaseType);
     let imports: any[] = [];
     let exports: any[] = [];
